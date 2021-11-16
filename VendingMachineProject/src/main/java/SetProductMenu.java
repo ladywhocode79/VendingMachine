@@ -22,7 +22,9 @@ public class SetProductMenu {
             displayProductsInMenu(arrayOfProducts);
             System.out.println("Enter the item id from menu to buy product: ");
             itemId = sc.nextInt();
-            if(itemId == 4){
+            if(itemId>4){
+                System.out.println("Invalid item id,please try again!!");
+               }else if(itemId == 4){
                 viewBalanceInVendingMachine();
             }else{
                  System.out.println("Pay the amount: ");
@@ -72,10 +74,10 @@ public class SetProductMenu {
     static void displayProductsInMenu(ProductMaster [] prodList){
         //Display products in Menu
         System.out.println("Hello! Select items from Menu");
-        System.out.println("Item id             Item Name               Item Price");
+        System.out.println("Item id\t\t\t\t\tItem Name\t\t\t\t\tItem Price");
         for(int i=0;i<prodList.length;i++){
-            System.out.println(prodList[i].productId+"               "+ prodList[i].productName +
-                    "                   " + prodList[i].productPrice);
+            System.out.println(prodList[i].productId+"\t\t\t\t\t"+ prodList[i].productName +
+                    "\t\t\t\t\t" + prodList[i].productPrice);
         }
         System.out.println("4              Balance in Machine               ");
     }
