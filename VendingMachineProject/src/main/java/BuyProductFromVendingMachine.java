@@ -8,15 +8,16 @@ public class BuyProductFromVendingMachine {
 
     public static void main(String[] args) {
         //set product lists,product id and product price
-        String[] arrayOfItems = {"Choco Bar", "WaterBottle", "Soda Bottle"};
-        int[] arrayOfItemsId = {1, 2, 3};
-        float[] arrayOfItemPrice = {10.00f, 23.4f, 30.00f};
+        String[] arrayOfItems = {"Choco Bar", "WaterBottle", "Soda Bottle", "Eraser", "Pen"};
+        int[] arrayOfItemsId = {1, 2, 3, 4, 5};
+        float[] arrayOfItemPrice = {10.00f, 23.4f, 30.00f, 15.00f, 23.90f};
+        int countOfMenuOptions = arrayOfItems.length + 2;
         char flagToBuy = 'Y';
         int itemId;
         float itemPrice;
         float customerBalance;
         float paidAmount;
-        float vendingMachineBalance = 00.00f;
+        float vendingMachineBalance = 05.00f;
         //arrays to store ledger details
         int[] arrayOfPurchasedItemsId = new int[MAX];
         float[] arrayOfAmountPaidByUserForATransaction = new float[MAX];
@@ -25,9 +26,7 @@ public class BuyProductFromVendingMachine {
         String[] arrayOfTransactionTime = new String[MAX];
         int transactionCount = 0;
 
-        LocalDateTime transactionTime;
 
-        String formattedDateTime;
         //System.in is a standard input stream
         Scanner sc = new Scanner(System.in);
         //set flag to purchase product true;
@@ -36,27 +35,33 @@ public class BuyProductFromVendingMachine {
             printVendingMachineMenu(arrayOfItemsId, arrayOfItems, arrayOfItemPrice);
             System.out.println("Enter the item id from menu to buy product: ");
             itemId = sc.nextInt();
-            if (itemId > 5) {
+            if (isInvalidOption(countOfMenuOptions, itemId)) {
                 //customer input number other than vending machine option
                 printInvalidMessage();
                 continue;
             }
-            if (itemId == 5) {
+            if (isLedgerBalanceOption(itemId, countOfMenuOptions)) {
                 printCustomerLedger(arrayOfPurchasedItemsId, arrayOfAmountPaidByUserForATransaction, arrayOfBalanceReturnedToUserForATransaction, arrayOfAmountInVendingMachine, arrayOfTransactionTime, transactionCount);
                 continue;
             }
-            if (itemId == 4) {
+            if (isVendingMachineBalanceOption(itemId, countOfMenuOptions)) {
                 //customer wants to check vending machine balance
                 printVendingMachineBalance(vendingMachineBalance);
                 continue;
             }
+
             //customer enter item id to buy product
             System.out.println("Pay the amount: ");
             paidAmount = sc.nextInt();
 
             itemPrice = arrayOfItemPrice[itemId - 1];
             //check if customer paid amount less than item price
+            if (noBalanceChangeAvailable(itemPrice, paidAmount, vendingMachineBalance)) {
+                System.out.println("Please provide exact change");
+                continue;
+            }
             if (itemPrice <= paidAmount) {
+
                 vendingMachineBalance = vendingMachineBalance + itemPrice;
                 customerBalance = buyProduct(itemPrice, paidAmount);
                 updateTransaction(itemId, customerBalance, paidAmount, vendingMachineBalance, arrayOfPurchasedItemsId, arrayOfAmountPaidByUserForATransaction, arrayOfBalanceReturnedToUserForATransaction, arrayOfAmountInVendingMachine, transactionCount);
@@ -77,6 +82,22 @@ public class BuyProductFromVendingMachine {
         }
 
         System.out.println("Thank you!!");
+    }
+
+    private static boolean noBalanceChangeAvailable(float itemPrice, float paidAmount, float vendingMachineBalance) {
+        return paidAmount - itemPrice > vendingMachineBalance;
+    }
+
+    private static boolean isVendingMachineBalanceOption(int itemId, int countOfMenuOptions) {
+        return itemId == countOfMenuOptions - 1;
+    }
+
+    private static boolean isLedgerBalanceOption(int itemId, int countOfMenuOptions) {
+        return itemId == countOfMenuOptions;
+    }
+
+    private static boolean isInvalidOption(int countOfMenuOptions, int itemId) {
+        return itemId > countOfMenuOptions;
     }
 
     private static void printBalanceMessage(float customerBalance) {
@@ -110,19 +131,19 @@ public class BuyProductFromVendingMachine {
 
     private static void printCustomerLedger(int[] arrayOfPurchasedItemsId,
                                             float[] arrayOfAmountPaidByUserForATransaction, float[] arrayOfBalanceReturnedToUserForATransaction, float[] arrayOfAmountInVendingMachine, String[] arrayOfTransactionTime, int transactionCount) {
-       if(transactionCount ==0){
-           System.out.println("No ldeger records found!!");
-       }else{
-        System.out.println("Printing customer ledger");
-        System.out.println("Transaction Time\t\tItemId\t\tUser Amount\t\tBalance Amount" +
-                "\t\tVending Machine Balance");
-           System.out.println("=================================================================");
-        for (int i = 0; i < transactionCount; i++) {
-            System.out.println(arrayOfTransactionTime[i] + "\t\t" + arrayOfPurchasedItemsId[i] + "\t\t" +
-                    arrayOfAmountPaidByUserForATransaction[i] + "\t\t" + arrayOfBalanceReturnedToUserForATransaction[i]
-                    + "\t\t" + arrayOfAmountInVendingMachine[i]);
+        if (transactionCount == 0) {
+            System.out.println("No ledger records found!!");
+        } else {
+            System.out.println("Printing customer ledger");
+            System.out.println("Transaction Time\t\tItemId\t\tUser Amount\t\tBalance Amount" +
+                    "\t\tVending Machine Balance");
+            System.out.println("=================================================================");
+            for (int i = 0; i < transactionCount; i++) {
+                System.out.println(arrayOfTransactionTime[i] + "\t\t" + arrayOfPurchasedItemsId[i] + "\t\t" +
+                        arrayOfAmountPaidByUserForATransaction[i] + "\t\t" + arrayOfBalanceReturnedToUserForATransaction[i]
+                        + "\t\t" + arrayOfAmountInVendingMachine[i]);
+            }
         }
-       }
     }
 
     private static void printInvalidMessage() {
@@ -137,8 +158,8 @@ public class BuyProductFromVendingMachine {
             for (int i = 0; i < arrayOfItemsId.length; i++) {
                 System.out.println(arrayOfItemsId[i] + "\t\t\t" + arrayOfItems[i] + "\t\t\t" + arrayOfItemPrice[i]);
             }
-            System.out.println("4 \t\t\tVending Machine Balance ");
-            System.out.println("5 \t\t\tUser Transaction History ");
+            System.out.println(arrayOfItemsId.length + 1 + " \t\t\tVending Machine Balance ");
+            System.out.println(arrayOfItemsId.length + 2 + " \t\t\tUser Transaction History ");
         }
     }
 
